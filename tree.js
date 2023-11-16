@@ -137,13 +137,135 @@ export default class Tree{
     find(value) {
         if (this.root === null) return null
 
-        if (value === this.root.value) return this.root
-        
-        else
+        return this.findRec(value, this.root)
+         
+    }
 
+    findRec(value, root) {        
+        if (root === null) return null
+        if (value === root.data) return root
+
+        if (value < root.data) {
+            return this.findRec(value, root.left)
+        } else {
+            return this.findRec(value, root.right)
+        }
+    }
+    
+    levelOrder(callback = null) {
+        let result = []
+        let queue = []
+
+        if (this.root === null) return result
+
+        queue.push(this.root)
+
+        while (queue.length > 0) {
+            result.push(callback ? callback(queue[0].data) : queue[0].data)
+            if (queue[0].left !== null) queue.push(queue[0].left)
+            if (queue[0].right !== null) queue.push(queue[0].right)
+            queue.shift()
+        } 
+
+        return result
+    }
+
+    inOrder(callback = null) {
+        const result = []
+
+        function traverse(root) {
+            if (root === null) return 
+
+            traverse(root.left)
+            result.push(callback ? callback(root.data) : root.data)
+            traverse(root.right)
+        }
+
+        traverse(this.root)
+
+        return result
+    }
+
+    preOrder(callback = null) {
+        const result = []
+
+        function traverse(root) {
+            if (root === null) return 
+            result.push(callback ? callback(root.data) : root.data)
+
+            traverse(root.left)
+            traverse(root.right)
+        }
+
+        traverse(this.root)
+
+        return result
     }
 
 
+    postOrder(callback = null) {
+        const result = []
+
+        function traverse(root) {
+            if (root === null) return 
+
+            traverse(root.left)
+            traverse(root.right)
+            result.push(callback ? callback(root.data) : root.data)
+        }
+
+        traverse(this.root)
+
+        return result
+    }
+
+    height(root = this.root) {
+        if (root === null) return -1;
+
+        let leftHeight = this.height(root.left)
+        let rightHeight = this.height(root.right)
+
+        return(1 + Math.max(leftHeight, rightHeight))
+    }
+
+
+    depth(node = this.root) {
+        let depthCount = -1
+
+        if (node === null || this.root === null) return depthCount;
+
+
+        function traverse(node, root) {
+            if (root === null) return null
+
+            depthCount++
+
+            if (node === root) return root
+    
+            if (node.data < root.data) {
+                traverse(node, root.left)
+            } else {
+                traverse(node, root.right)
+            }
+        }
+
+        traverse(node, this.root)
+
+        return(depthCount)
+    }
+
+    isBalanced() {
+        if (this.root === null) return null
+
+        let leftHeight = this.height(this.root.left)
+        let rightHeight = this.height(this.root.right)
+
+        return (Math.abs(leftHeight - rightHeight) < 2)  
+    }
+
+    rebalance() {
+        this.root = this.buildTree(this.inOrder())
+    }
 
 
 }
